@@ -1,0 +1,46 @@
+spring:
+  r2dbc:
+    url: r2dbc:h2:mem:///scheduledb?options=DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password:
+  application:
+    name: schedule-service
+logging:
+  level:
+    org.springframework.data.r2dbc: Debug
+
+server:
+  port: 8083
+
+---
+spring:
+  config:
+    activate:
+      on-profile: test
+  r2dbc:
+    url: r2dbc:h2:mem:///test?options=DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    name: sa
+    password:
+  application:
+    name: schedule-service
+
+server:
+  port: 8083
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+  r2dbc:
+    url: r2dbc:postgresql://localhost:5433/scheduledb
+    username: postgres
+    password: postgres
+  application:
+    name: schedule-service
+  logging:
+    level:
+      org.springframework.data.r2dbc: Debug
+
+server:
+  port: 8083
