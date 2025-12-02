@@ -36,4 +36,14 @@ public interface ScheduleRepository extends R2dbcRepository<Schedule, Long> {
             @Param("startAt") LocalDateTime startAt,
             @Param("endAt") LocalDateTime endAt,
             @Param("id") Long id);
+    
+    @Query("SELECT * FROM schedule WHERE employee_id = :employeeId AND " +
+           "start_at = :startAt AND end_at = :endAt AND " +
+           "group_session = true AND " +
+           "(:id IS NULL OR id != :id)")
+    Flux<Schedule> findExactGroupSession(
+            @Param("employeeId") Long employeeId,
+            @Param("startAt") LocalDateTime startAt,
+            @Param("endAt") LocalDateTime endAt,
+            @Param("id") Long id);
 }

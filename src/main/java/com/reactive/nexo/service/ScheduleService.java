@@ -60,14 +60,17 @@ public class ScheduleService {
             return Mono.error(new ResponseStatusException(HttpStatus.BAD_REQUEST, "Start time must be before end time"));
         }
         
+        boolean isGroupSession = request.getGroupSession() != null ? request.getGroupSession() : false;
+        
         return validateNoOverlap(request.getEmployeeId(), request.getUserId(), 
-                               request.getStartAt(), request.getEndAt(), null)
+                               request.getStartAt(), request.getEndAt(), null, isGroupSession)
                 .then(scheduleRepository.save(new Schedule(
                         request.getEmployeeId(),
                         request.getUserId(),
                         request.getStartAt(),
                         request.getEndAt(),
-                        request.getDetails()
+                        request.getDetails(),
+                        isGroupSession
                 )));
     }
     
@@ -76,17 +79,20 @@ public class ScheduleService {
             return Mono.error(new ResponseStatusException(HttpStatus.BAD_REQUEST, "Start time must be before end time"));
         }
         
+        boolean isGroupSession = request.getGroupSession() != null ? request.getGroupSession() : false;
+        
         return scheduleRepository.findById(id)
                 .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Schedule not found")))
                 .flatMap(existingSchedule -> 
                         validateNoOverlap(request.getEmployeeId(), request.getUserId(), 
-                                        request.getStartAt(), request.getEndAt(), id)
+                                        request.getStartAt(), request.getEndAt(), id, isGroupSession)
                                 .then(Mono.defer(() -> {
                                     existingSchedule.setEmployeeId(request.getEmployeeId());
                                     existingSchedule.setUserId(request.getUserId());
                                     existingSchedule.setStartAt(request.getStartAt());
                                     existingSchedule.setEndAt(request.getEndAt());
                                     existingSchedule.setDetails(request.getDetails());
+                                    existingSchedule.setGroupSession(isGroupSession);
                                     existingSchedule.setUpdatedAt(LocalDateTime.now());
                                     return scheduleRepository.save(existingSchedule);
                                 }))
@@ -100,7 +106,28 @@ public class ScheduleService {
     }
     
     private Mono<Void> validateNoOverlap(Long employeeId, Long userId, 
-                                       LocalDateTime startAt, LocalDateTime endAt, Long excludeId) {
+                                       LocalDateTime startAt, LocalDateTime endAt, Long excludeId, boolean isGroupSession) {
+        if (isGroupSession) {
+            // Para sesiones grupales, verificar si ya existe una sesión grupal exacta
+            return scheduleRepository.findExactGroupSession(employeeId, startAt, endAt, excludeId)
+                    .hasElements()
+                    .flatMap(hasExactGroupSession -> {
+                        if (hasExactGroupSession) {
+                            // Permitir solapamiento para sesiones grupales con horas exactas
+                            return Mono.empty();
+                        } else {
+                            // Si no hay sesión grupal exacta, verificar solapamientos normales
+                            return validateOverlapForIndividualSessions(employeeId, userId, startAt, endAt, excludeId);
+                        }
+                    });
+        } else {
+            // Para sesiones individuales, aplicar validación normal
+            return validateOverlapForIndividualSessions(employeeId, userId, startAt, endAt, excludeId);
+        }
+    }
+    
+    private Mono<Void> validateOverlapForIndividualSessions(Long employeeId, Long userId, 
+                                                           LocalDateTime startAt, LocalDateTime endAt, Long excludeId) {
         Mono<Long> employeeOverlapCheck = scheduleRepository.countOverlappingSchedulesForEmployee(
                 employeeId, startAt, endAt, excludeId);
         

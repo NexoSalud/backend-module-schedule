@@ -51,7 +51,8 @@ public class ScheduleInitializer implements CommandLineRunner {
                 employeeId, // Usando el mismo ID para user por simplicidad
                 morningStart,
                 morningEnd,
-                String.format("Consulta general - Empleado %d", employeeId)
+                String.format("Consulta general - Empleado %d", employeeId),
+                false // Sesión individual
             ));
             
             // Cita vespertina
@@ -62,7 +63,8 @@ public class ScheduleInitializer implements CommandLineRunner {
                 employeeId + 10, // Usuario diferente
                 afternoonStart,
                 afternoonEnd,
-                String.format("Control médico - Empleado %d", employeeId)
+                String.format("Control médico - Empleado %d", employeeId),
+                false // Sesión individual
             ));
             
             // Cita adicional para algunos empleados
@@ -74,7 +76,8 @@ public class ScheduleInitializer implements CommandLineRunner {
                     employeeId + 20, // Usuario diferente
                     extraStart,
                     extraEnd,
-                    String.format("Procedimiento especializado - Empleado %d", employeeId)
+                    String.format("Procedimiento especializado - Empleado %d", employeeId),
+                    false // Sesión individual
                 ));
             }
         }
@@ -89,9 +92,44 @@ public class ScheduleInitializer implements CommandLineRunner {
                 employeeId + 30,
                 start,
                 end,
-                String.format("Cita de seguimiento semanal - Empleado %d", employeeId)
+                String.format("Cita de seguimiento semanal - Empleado %d", employeeId),
+                false // Sesión individual
             ));
         }
+        
+        // Agregar sesiones grupales de ejemplo
+        // Empleado 1: Sesión grupal de terapia
+        LocalDateTime groupSession1Start = baseTime.plusDays(2).withHour(16);
+        LocalDateTime groupSession1End = groupSession1Start.plusHours(1);
+        
+        schedules.add(new Schedule(1L, 100L, groupSession1Start, groupSession1End, 
+                "Terapia grupal - Manejo del estrés", true));
+        schedules.add(new Schedule(1L, 101L, groupSession1Start, groupSession1End, 
+                "Terapia grupal - Manejo del estrés", true));
+        schedules.add(new Schedule(1L, 102L, groupSession1Start, groupSession1End, 
+                "Terapia grupal - Manejo del estrés", true));
+        
+        // Empleado 2: Sesión grupal educativa
+        LocalDateTime groupSession2Start = baseTime.plusDays(3).withHour(11);
+        LocalDateTime groupSession2End = groupSession2Start.plusHours(1).plusMinutes(30);
+        
+        schedules.add(new Schedule(2L, 103L, groupSession2Start, groupSession2End, 
+                "Sesión educativa - Nutrición saludable", true));
+        schedules.add(new Schedule(2L, 104L, groupSession2Start, groupSession2End, 
+                "Sesión educativa - Nutrición saludable", true));
+        
+        // Empleado 3: Sesión grupal de ejercicios
+        LocalDateTime groupSession3Start = baseTime.plusDays(5).withHour(8);
+        LocalDateTime groupSession3End = groupSession3Start.plusMinutes(45);
+        
+        schedules.add(new Schedule(3L, 105L, groupSession3Start, groupSession3End, 
+                "Clase grupal de ejercicios terapéuticos", true));
+        schedules.add(new Schedule(3L, 106L, groupSession3Start, groupSession3End, 
+                "Clase grupal de ejercicios terapéuticos", true));
+        schedules.add(new Schedule(3L, 107L, groupSession3Start, groupSession3End, 
+                "Clase grupal de ejercicios terapéuticos", true));
+        schedules.add(new Schedule(3L, 108L, groupSession3Start, groupSession3End, 
+                "Clase grupal de ejercicios terapéuticos", true));
         
         return scheduleRepository.saveAll(schedules);
     }

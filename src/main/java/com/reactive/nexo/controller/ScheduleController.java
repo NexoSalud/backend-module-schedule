@@ -87,12 +87,13 @@ public class ScheduleController {
     
     @Operation(
         summary = "Crear nueva cita",
-        description = "Crea una nueva cita en el sistema. Valida que no haya solapamiento de horarios"
+        description = "Crea una nueva cita en el sistema. Valida que no haya solapamiento de horarios para sesiones individuales. " +
+                     "Para sesiones grupales (groupSession=true), permite múltiples usuarios en la misma hora exacta con el mismo empleado."
     )
     @ApiResponses(value = {
         @ApiResponse(responseCode = "201", description = "Cita creada exitosamente"),
-        @ApiResponse(responseCode = "400", description = "Datos inválidos"),
-        @ApiResponse(responseCode = "409", description = "Conflicto de horarios - cita solapada")
+        @ApiResponse(responseCode = "400", description = "Datos inválidos - hora de inicio debe ser anterior a hora de fin"),
+        @ApiResponse(responseCode = "409", description = "Conflicto de horarios - cita solapada para sesiones individuales")
     })
     @PostMapping
     public Mono<ResponseEntity<Schedule>> createSchedule(
