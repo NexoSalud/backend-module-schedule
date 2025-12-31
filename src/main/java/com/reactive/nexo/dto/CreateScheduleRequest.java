@@ -27,6 +27,16 @@ public class CreateScheduleRequest {
     @Schema(description = "Detalles adicionales de la cita", example = "Consulta médica general")
     private String details;
     
+    @Schema(description = "Sede donde se realizará la cita", example = "Sede Central", required = true)
+    private String headquarters;
+    
+    @Schema(description = "Oficina donde se realizará la cita", example = "Oficina 101", required = true)
+    private String office;
+    
+    @Schema(description = "Indica si la cita es presencial", 
+            example = "false", defaultValue = "false")
+    private Boolean inPerson;
+    
     @Schema(description = "Indica si es una sesión grupal que permite múltiples usuarios en la misma hora", 
             example = "false", defaultValue = "false")
     private Boolean groupSession;

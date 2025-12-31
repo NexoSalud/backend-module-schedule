@@ -52,6 +52,9 @@ public class ScheduleInitializer implements CommandLineRunner {
                 morningStart,
                 morningEnd,
                 String.format("Consulta general - Empleado %d", employeeId),
+                "Sede Central",
+                "Oficina 101",
+                false, // Presencial
                 false // Sesión individual
             ));
             

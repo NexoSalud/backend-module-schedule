@@ -5,10 +5,21 @@ CREATE TABLE IF NOT EXISTS schedule (
     start_at TIMESTAMP NOT NULL,
     end_at TIMESTAMP NOT NULL,
     details TEXT,
+    headquarters VARCHAR(100),
+    office VARCHAR(100),
+    in_person BOOLEAN DEFAULT FALSE,
     group_session BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Ensure columns exist when table was created earlier without them
+ALTER TABLE schedule ADD COLUMN IF NOT EXISTS headquarters VARCHAR(100);
+ALTER TABLE schedule ADD COLUMN IF NOT EXISTS office VARCHAR(100);
+ALTER TABLE schedule ADD COLUMN IF NOT EXISTS in_person BOOLEAN DEFAULT FALSE;
+ALTER TABLE schedule ADD COLUMN IF NOT EXISTS group_session BOOLEAN DEFAULT FALSE;
+ALTER TABLE schedule ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE schedule ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
 
 CREATE INDEX IF NOT EXISTS idx_schedule_employee_id ON schedule(employee_id);
 CREATE INDEX IF NOT EXISTS idx_schedule_user_id ON schedule(user_id);

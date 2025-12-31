@@ -41,6 +41,37 @@ public class ScheduleService {
                             });
                 });
     }
+
+    public Mono<PagedResponse<Schedule>> getAllSchedules(int page, int size, LocalDateTime startAt, LocalDateTime endAt) {
+        Mono<Long> countMono;
+        Flux<Schedule> dataFlux;
+
+        if (startAt != null && endAt != null) {
+            countMono = scheduleRepository.countByStartAtGreaterThanEqualAndEndAtLessThanEqual(startAt, endAt);
+            dataFlux = scheduleRepository.findByStartAtGreaterThanEqualAndEndAtLessThanEqual(startAt, endAt);
+        } else if (startAt != null) {
+            countMono = scheduleRepository.countByStartAtGreaterThanEqual(startAt);
+            dataFlux = scheduleRepository.findByStartAtGreaterThanEqual(startAt);
+        } else if (endAt != null) {
+            countMono = scheduleRepository.countByEndAtLessThanEqual(endAt);
+            dataFlux = scheduleRepository.findByEndAtLessThanEqual(endAt);
+        } else {
+            countMono = scheduleRepository.count();
+            dataFlux = scheduleRepository.findAll();
+        }
+
+        return countMono.flatMap(totalElements ->
+                dataFlux
+                        .skip((long) page * size)
+                        .take(size)
+                        .collectList()
+                        .map(content -> {
+                            long totalPages = (totalElements + size - 1) / size;
+                            boolean isLast = page >= totalPages - 1;
+                            return new PagedResponse<>(content, page, size, totalElements, totalPages, isLast);
+                        })
+        );
+    }
     
     public Mono<Schedule> getScheduleById(Long id) {
         return scheduleRepository.findById(id)
@@ -94,6 +125,10 @@ public class ScheduleService {
                                     existingSchedule.setDetails(request.getDetails());
                                     existingSchedule.setGroupSession(isGroupSession);
                                     existingSchedule.setUpdatedAt(LocalDateTime.now());
+                                    existingSchedule.setHeadquarters(request.getHeadquarters());
+                                    existingSchedule.setOffice(request.getOffice());
+                                    existingSchedule.setInPerson(request.getInPerson());
+                                    
                                     return scheduleRepository.save(existingSchedule);
                                 }))
                 );

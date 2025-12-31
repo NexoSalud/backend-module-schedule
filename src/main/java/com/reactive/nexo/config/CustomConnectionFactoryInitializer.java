@@ -15,7 +15,7 @@ public class CustomConnectionFactoryInitializer {
         ConnectionFactoryInitializer initializer = new ConnectionFactoryInitializer();
         initializer.setConnectionFactory(connectionFactory);
         CompositeDatabasePopulator populator = new CompositeDatabasePopulator();
-        populator.addPopulators(new ResourceDatabasePopulator(new ClassPathResource("schema.sql")));
+        populator.addPopulators(new ResourceDatabasePopulator(new ClassPathResource("db/migration/schema.sql")));
         initializer.setDatabasePopulator(populator);
         return initializer;
     }

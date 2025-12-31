@@ -46,4 +46,16 @@ public interface ScheduleRepository extends R2dbcRepository<Schedule, Long> {
             @Param("startAt") LocalDateTime startAt,
             @Param("endAt") LocalDateTime endAt,
             @Param("id") Long id);
+
+       Flux<Schedule> findByStartAtGreaterThanEqual(LocalDateTime startAt);
+
+       Flux<Schedule> findByEndAtLessThanEqual(LocalDateTime endAt);
+
+       Flux<Schedule> findByStartAtGreaterThanEqualAndEndAtLessThanEqual(LocalDateTime startAt, LocalDateTime endAt);
+
+       Mono<Long> countByStartAtGreaterThanEqual(LocalDateTime startAt);
+
+       Mono<Long> countByEndAtLessThanEqual(LocalDateTime endAt);
+
+       Mono<Long> countByStartAtGreaterThanEqualAndEndAtLessThanEqual(LocalDateTime startAt, LocalDateTime endAt);
 }
