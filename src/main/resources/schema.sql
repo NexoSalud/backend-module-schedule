@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS schedule (
     start_at TIMESTAMP NOT NULL,
     end_at TIMESTAMP NOT NULL,
     details TEXT,
+    group_session BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

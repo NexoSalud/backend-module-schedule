@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
@@ -31,15 +32,21 @@ public class ScheduleController {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Lista de citas obtenida exitosamente")
     })
-    @GetMapping
-    public Mono<ResponseEntity<PagedResponse<Schedule>>> getAllSchedules(
+        @GetMapping
+        public Mono<ResponseEntity<PagedResponse<Schedule>>> getAllSchedules(
             @Parameter(description = "Número de página (base 0)", example = "0")
             @RequestParam(defaultValue = "0") int page,
             @Parameter(description = "Tamaño de página", example = "10")
-            @RequestParam(defaultValue = "10") int size) {
-        return scheduleService.getAllSchedules(page, size)
-                .map(ResponseEntity::ok);
-    }
+            @RequestParam(defaultValue = "10") int size,
+            @Parameter(description = "Filtra por fecha/hora de inicio (ISO)", example = "2025-01-01T00:00:00")
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) java.time.LocalDateTime startAt,
+            @Parameter(description = "Filtra por fecha/hora de fin (ISO)", example = "2025-01-31T23:59:59")
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) java.time.LocalDateTime endAt) {
+        return scheduleService.getAllSchedules(page, size, startAt, endAt)
+            .map(ResponseEntity::ok);
+        }
     
     @Operation(
         summary = "Obtener cita por ID",
@@ -87,12 +94,13 @@ public class ScheduleController {
     
     @Operation(
         summary = "Crear nueva cita",
-        description = "Crea una nueva cita en el sistema. Valida que no haya solapamiento de horarios"
+        description = "Crea una nueva cita en el sistema. Valida que no haya solapamiento de horarios para sesiones individuales. " +
+                     "Para sesiones grupales (groupSession=true), permite múltiples usuarios en la misma hora exacta con el mismo empleado."
     )
     @ApiResponses(value = {
         @ApiResponse(responseCode = "201", description = "Cita creada exitosamente"),
-        @ApiResponse(responseCode = "400", description = "Datos inválidos"),
-        @ApiResponse(responseCode = "409", description = "Conflicto de horarios - cita solapada")
+        @ApiResponse(responseCode = "400", description = "Datos inválidos - hora de inicio debe ser anterior a hora de fin"),
+        @ApiResponse(responseCode = "409", description = "Conflicto de horarios - cita solapada para sesiones individuales")
     })
     @PostMapping
     public Mono<ResponseEntity<Schedule>> createSchedule(
