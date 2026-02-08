@@ -8,10 +8,8 @@ import com.reactive.nexo.dto.CreateMedicalAgendaRequest;
 import com.reactive.nexo.model.MedicalAgenda;
 import com.reactive.nexo.repository.MedicalAgendaRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -26,10 +24,6 @@ import java.util.*;
 public class MedicalAgendaService {
 
     private final MedicalAgendaRepository repository;
-    private final WebClient webClient = WebClient.create(System.getenv().getOrDefault("EMPLOYEES_SERVICE_URL", "http://localhost:8081"));
-
-    @Value("${service.gateway.url:http://localhost:8080}")
-    private String gatewayUrl;
 
     private static final DateTimeFormatter ISO_DATE = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
@@ -272,86 +266,27 @@ public class MedicalAgendaService {
     }
 
     private Mono<MedicalAgendaView> enrichWithEmployee(MedicalAgenda ma, HttpHeaders headers) {
-        String auth = headers.getFirst("Authorization");
-        String empId = headers.getFirst("x-employee-id");
-
-        // Si no hay cabeceras de autenticación, devolver datos mínimos sin consultar empleado
-        if (auth == null && empId == null) {
-            MedicalAgendaView.EmployeeDto e = new MedicalAgendaView.EmployeeDto(ma.getEmployeeId(), "", "", "", "", 0, true);
-            MedicalAgendaView view = new MedicalAgendaView(
-                    ma.getId(),
-                    ma.getEmployeeId(),
-                    e,
-                    ma.getModality(),
-                    ma.getHeadquartersId(),
-                    ma.getOfficeId(),
-                    ma.getStartDate() != null ? ma.getStartDate().format(ISO_DATE) : null,
-                    ma.getEndDate() != null ? ma.getEndDate().format(ISO_DATE) : null,
-                    ma.getWorkDays(),
-                    ma.getStartTime(),
-                    ma.getEndTime(),
-                    ma.getAppointmentDuration(),
-                    ma.getServiceTypes(),
-                    ma.getAllowGroupSession(),
-                    ma.getRequiresReferral(),
-                    ma.getNotes(),
-                    ma.getStatus(),
-                    ma.getIsActive(),
-                    ma.getCreatedAt() != null ? ma.getCreatedAt().toString() : null,
-                    ma.getUpdatedAt() != null ? ma.getUpdatedAt().toString() : null
-            );
-            return Mono.just(view);
-        }
-
-        return webClient.get()
-                .uri(gatewayUrl + "/api/v1/employees/" + ma.getEmployeeId())
-                .headers(h -> {
-                    if (auth != null) h.add("Authorization", auth);
-                    if (empId != null) h.add("x-employee-id", empId);
-                })
-                .retrieve()
-                .bodyToMono(EmployeeMini.class)
-                .onErrorResume(ex -> Mono.just(new EmployeeMini(ma.getEmployeeId(), "", "", "", "", 0, true)))
-                .map(emp -> {
-                    MedicalAgendaView.EmployeeDto e = new MedicalAgendaView.EmployeeDto(emp.id, emp.names, emp.lastnames, emp.identification_type, emp.identification_number, emp.rol_id, emp.is_active);
-                    MedicalAgendaView view = new MedicalAgendaView(
-                            ma.getId(),
-                            ma.getEmployeeId(),
-                            e,
-                            ma.getModality(),
-                            ma.getHeadquartersId(),
-                            ma.getOfficeId(),
-                            ma.getStartDate() != null ? ma.getStartDate().format(ISO_DATE) : null,
-                            ma.getEndDate() != null ? ma.getEndDate().format(ISO_DATE) : null,
-                            ma.getWorkDays(),
-                            ma.getStartTime(),
-                            ma.getEndTime(),
-                            ma.getAppointmentDuration(),
-                            ma.getServiceTypes(),
-                            ma.getAllowGroupSession(),
-                            ma.getRequiresReferral(),
-                            ma.getNotes(),
-                            ma.getStatus(),
-                            ma.getIsActive(),
-                            ma.getCreatedAt() != null ? ma.getCreatedAt().toString() : null,
-                            ma.getUpdatedAt() != null ? ma.getUpdatedAt().toString() : null
-                    );
-                    return view;
-                });
-    }
-
-    static class EmployeeMini {
-        public Long id;
-        public String names;
-        public String lastnames;
-        public String identification_type;
-        public String identification_number;
-        public Integer rol_id;
-        public Boolean is_active;
-
-        public EmployeeMini() {}
-        public EmployeeMini(Long id, String names, String lastnames, String identification_type, String identification_number, Integer rol_id, Boolean is_active) {
-            this.id = id; this.names = names; this.lastnames = lastnames; this.identification_type = identification_type; this.identification_number = identification_number; this.rol_id = rol_id; this.is_active = is_active;
-        }
+        MedicalAgendaView view = new MedicalAgendaView(
+                ma.getId(),
+                ma.getEmployeeId(),
+                ma.getModality(),
+                ma.getHeadquartersId(),
+                ma.getOfficeId(),
+                ma.getStartDate() != null ? ma.getStartDate().format(ISO_DATE) : null,
+                ma.getEndDate() != null ? ma.getEndDate().format(ISO_DATE) : null,
+                ma.getWorkDays(),
+                ma.getStartTime(),
+                ma.getEndTime(),
+                ma.getAppointmentDuration(),
+                ma.getServiceTypes(),
+                ma.getAllowGroupSession(),
+                ma.getRequiresReferral(),
+                ma.getNotes(),
+                ma.getStatus(),
+                ma.getIsActive(),
+                ma.getCreatedAt() != null ? ma.getCreatedAt().toString() : null,
+                ma.getUpdatedAt() != null ? ma.getUpdatedAt().toString() : null
+        );
+        return Mono.just(view);
     }
 }
