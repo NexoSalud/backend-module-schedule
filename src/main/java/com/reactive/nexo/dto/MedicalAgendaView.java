@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 public class MedicalAgendaView {
     public Long id;
     public Long employeeId;
-    public EmployeeDto employee; // Datos mínimos para el listado
     public String modality;
     public Long headquartersId;
     public Long officeId;
@@ -28,17 +27,4 @@ public class MedicalAgendaView {
     public Boolean isActive;
     public String createdAt;
     public String updatedAt;
-
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class EmployeeDto {
-        public Long id;
-        public String names;
-        public String lastnames;
-        public String identification_type;
-        public String identification_number;
-        public Integer rol_id;
-        public Boolean is_active;
-    }
 }
