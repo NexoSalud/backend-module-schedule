@@ -54,13 +54,18 @@ public class MedicalAgendaService {
     }
 
     public Mono<MedicalAgenda> create(MedicalAgenda payload) {
-        if (payload.getEnabled() == null) {
-            payload.setEnabled(true);
-        }
         payload.setStatus(computeStatus(payload.getStartDate(), payload.getEndDate(), Boolean.TRUE.equals(payload.getIsActive())));
         payload.setCreatedAt(LocalDateTime.now());
         payload.setUpdatedAt(LocalDateTime.now());
-        return repository.save(payload);
+        
+        return checkConflicts(payload).flatMap(conflicts -> {
+            if (conflicts != null && !conflicts.isEmpty()) {
+                payload.setEnabled(false);
+            } else if (payload.getEnabled() == null) {
+                payload.setEnabled(true);
+            }
+            return repository.save(payload);
+        });
     }
 
     public Mono<MedicalAgenda> createFromDto(CreateMedicalAgendaRequest dto) {
@@ -88,12 +93,19 @@ public class MedicalAgendaService {
         payload.setRequiresReferral(Boolean.TRUE.equals(dto.getRequiresReferral()));
         payload.setNotes(dto.getNotes());
         payload.setIsActive(true); // por defecto activa
-        payload.setEnabled(true); // por defecto habilitado
-
+        
         payload.setStatus(computeStatus(payload.getStartDate(), payload.getEndDate(), Boolean.TRUE.equals(payload.getIsActive())));
         payload.setCreatedAt(LocalDateTime.now());
         payload.setUpdatedAt(LocalDateTime.now());
-        return repository.save(payload);
+        
+        return checkConflicts(payload).flatMap(conflicts -> {
+            if (conflicts != null && !conflicts.isEmpty()) {
+                payload.setEnabled(false);
+            } else {
+                payload.setEnabled(true);
+            }
+            return repository.save(payload);
+        });
     }
 
     public Mono<MedicalAgenda> update(Long id, MedicalAgenda payload) {
