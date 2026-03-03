@@ -12,6 +12,8 @@ public interface MedicalAgendaRepository extends R2dbcRepository<MedicalAgenda, 
     Flux<MedicalAgenda> findByEmployeeId(Long employeeId);
 
     Flux<MedicalAgenda> findByIsActive(Boolean isActive);
+    
+    Flux<MedicalAgenda> findByEnabled(Boolean enabled);
 
     @Query("SELECT COUNT(*) FROM medical_agenda")
     Mono<Long> countAll();

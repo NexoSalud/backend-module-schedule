@@ -25,6 +25,7 @@ public class MedicalAgendaView {
     public String notes;
     public String status;
     public Boolean isActive;
+    public Boolean enabled;
     public String createdAt;
     public String updatedAt;
 }

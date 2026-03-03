@@ -67,6 +67,13 @@ public class MedicalAgendaController {
         return service.patch(id, payload).map(ResponseEntity::ok);
     }
 
+    @Operation(summary = "Cambiar estado enabled de una agenda médica")
+    @ApiResponse(responseCode = "200", description = "Estado cambiado")
+    @PatchMapping("/{id}/enabled")
+    public Mono<ResponseEntity<MedicalAgenda>> updateEnabled(@PathVariable Long id, @RequestParam Boolean enabled) {
+        return service.updateEnabled(id, enabled).map(ResponseEntity::ok);
+    }
+
     @Operation(summary = "Eliminar agenda médica")
     @ApiResponse(responseCode = "204", description = "Agenda eliminada")
     @DeleteMapping("/{id}")

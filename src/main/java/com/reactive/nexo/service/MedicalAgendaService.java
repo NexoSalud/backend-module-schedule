@@ -54,6 +54,9 @@ public class MedicalAgendaService {
     }
 
     public Mono<MedicalAgenda> create(MedicalAgenda payload) {
+        if (payload.getEnabled() == null) {
+            payload.setEnabled(true);
+        }
         payload.setStatus(computeStatus(payload.getStartDate(), payload.getEndDate(), Boolean.TRUE.equals(payload.getIsActive())));
         payload.setCreatedAt(LocalDateTime.now());
         payload.setUpdatedAt(LocalDateTime.now());
@@ -85,6 +88,7 @@ public class MedicalAgendaService {
         payload.setRequiresReferral(Boolean.TRUE.equals(dto.getRequiresReferral()));
         payload.setNotes(dto.getNotes());
         payload.setIsActive(true); // por defecto activa
+        payload.setEnabled(true); // por defecto habilitado
 
         payload.setStatus(computeStatus(payload.getStartDate(), payload.getEndDate(), Boolean.TRUE.equals(payload.getIsActive())));
         payload.setCreatedAt(LocalDateTime.now());
@@ -110,6 +114,7 @@ public class MedicalAgendaService {
                     existing.setRequiresReferral(payload.getRequiresReferral());
                     existing.setNotes(payload.getNotes());
                     existing.setIsActive(payload.getIsActive());
+                    existing.setEnabled(payload.getEnabled());
                     existing.setStatus(computeStatus(existing.getStartDate(), existing.getEndDate(), Boolean.TRUE.equals(existing.getIsActive())));
                     existing.setUpdatedAt(LocalDateTime.now());
                     return repository.save(existing);
@@ -134,7 +139,17 @@ public class MedicalAgendaService {
                     if (payload.getRequiresReferral() != null) existing.setRequiresReferral(payload.getRequiresReferral());
                     if (payload.getNotes() != null) existing.setNotes(payload.getNotes());
                     if (payload.getIsActive() != null) existing.setIsActive(payload.getIsActive());
+                    if (payload.getEnabled() != null) existing.setEnabled(payload.getEnabled());
                     existing.setStatus(computeStatus(existing.getStartDate(), existing.getEndDate(), Boolean.TRUE.equals(existing.getIsActive())));
+                    existing.setUpdatedAt(LocalDateTime.now());
+                    return repository.save(existing);
+                });
+    }
+
+    public Mono<MedicalAgenda> updateEnabled(Long id, Boolean enabled) {
+        return repository.findById(id)
+                .flatMap(existing -> {
+                    existing.setEnabled(enabled);
                     existing.setUpdatedAt(LocalDateTime.now());
                     return repository.save(existing);
                 });
@@ -148,7 +163,7 @@ public class MedicalAgendaService {
         LocalDate start = LocalDate.parse(startDate, ISO_DATE);
         LocalDate end = LocalDate.parse(endDate, ISO_DATE);
         return repository.findByEmployeeId(employeeId)
-                .filter(ma -> isDateRangeOverlap(start, end, ma.getStartDate(), ma.getEndDate()))
+                .filter(ma -> Boolean.TRUE.equals(ma.getEnabled()) && isDateRangeOverlap(start, end, ma.getStartDate(), ma.getEndDate()))
                 .collectList()
                 .map(agendas -> {
                     List<CalendarEventDto> events = new ArrayList<>();
@@ -284,6 +299,7 @@ public class MedicalAgendaService {
                 ma.getNotes(),
                 ma.getStatus(),
                 ma.getIsActive(),
+                ma.getEnabled(),
                 ma.getCreatedAt() != null ? ma.getCreatedAt().toString() : null,
                 ma.getUpdatedAt() != null ? ma.getUpdatedAt().toString() : null
         );

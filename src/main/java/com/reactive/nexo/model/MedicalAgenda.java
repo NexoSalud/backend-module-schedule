@@ -38,6 +38,7 @@ public class MedicalAgenda {
 
     private String status;    // VIGENTE | CON_CONFLICTOS | PROXIMA_A_VENCER | VENCIDA | INACTIVA
     private Boolean isActive;
+    private Boolean enabled;
     private LocalDateTime createdAt; // TIMESTAMP
     private LocalDateTime updatedAt; // TIMESTAMP
 }
