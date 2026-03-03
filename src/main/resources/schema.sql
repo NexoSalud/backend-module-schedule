@@ -6,6 +6,8 @@ CREATE TABLE IF NOT EXISTS schedule (
     end_at TIMESTAMP NOT NULL,
     details TEXT,
     group_session BOOLEAN DEFAULT FALSE,
+    office_id BIGINT,
+    agenda_id BIGINT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

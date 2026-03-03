@@ -58,4 +58,27 @@ public interface ScheduleRepository extends R2dbcRepository<Schedule, Long> {
        Mono<Long> countByEndAtLessThanEqual(LocalDateTime endAt);
 
        Mono<Long> countByStartAtGreaterThanEqualAndEndAtLessThanEqual(LocalDateTime startAt, LocalDateTime endAt);
+
+       @Query("SELECT * FROM schedule WHERE " +
+              "(:startAt IS NULL OR start_at >= :startAt) AND " +
+              "(:endAt IS NULL OR end_at <= :endAt) AND " +
+              "(:officeId IS NULL OR office_id = :officeId) AND " +
+              "(:agendaId IS NULL OR agenda_id = :agendaId) " +
+              "ORDER BY start_at ASC OFFSET :offset LIMIT :limit")
+       Flux<Schedule> findAllWithFilters(@Param("startAt") LocalDateTime startAt, 
+                                         @Param("endAt") LocalDateTime endAt, 
+                                         @Param("officeId") Long officeId, 
+                                         @Param("agendaId") Long agendaId,
+                                         @Param("limit") int limit,
+                                         @Param("offset") int offset);
+
+       @Query("SELECT count(*) FROM schedule WHERE " +
+              "(:startAt IS NULL OR start_at >= :startAt) AND " +
+              "(:endAt IS NULL OR end_at <= :endAt) AND " +
+              "(:officeId IS NULL OR office_id = :officeId) AND " +
+              "(:agendaId IS NULL OR agenda_id = :agendaId)")
+       Mono<Long> countWithFilters(@Param("startAt") LocalDateTime startAt, 
+                                   @Param("endAt") LocalDateTime endAt, 
+                                   @Param("officeId") Long officeId, 
+                                   @Param("agendaId") Long agendaId);
 }

@@ -46,13 +46,19 @@ public class Schedule {
     @Schema(description = "Indica si es una sesión grupal", example = "false")
     private Boolean groupSession;
     
+    @Schema(description = "ID de la oficina o consultorio", example = "1")
+    private Long officeId;
+
+    @Schema(description = "ID de la agenda", example = "1")
+    private Long agendaId;
+
     @Schema(description = "Fecha de creación del registro")
     private LocalDateTime createdAt;
     
     @Schema(description = "Fecha de última actualización")
     private LocalDateTime updatedAt;
 
-    public Schedule(Long employeeId, Long userId, LocalDateTime startAt, LocalDateTime endAt, String details, String headquarters, String office, Boolean inPerson, Boolean groupSession) {
+    public Schedule(Long employeeId, Long userId, LocalDateTime startAt, LocalDateTime endAt, String details, String headquarters, String office, Boolean inPerson, Boolean groupSession, Long officeId, Long agendaId) {
         this.employeeId = employeeId;
         this.userId = userId;
         this.startAt = startAt;
@@ -62,15 +68,21 @@ public class Schedule {
         this.office = office;
         this.inPerson = inPerson != null ? inPerson : false;
         this.groupSession = groupSession != null ? groupSession : false;
+        this.officeId = officeId;
+        this.agendaId = agendaId;
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }
     
+    public Schedule(Long employeeId, Long userId, LocalDateTime startAt, LocalDateTime endAt, String details, String headquarters, String office, Boolean inPerson, Boolean groupSession) {
+        this(employeeId, userId, startAt, endAt, details, headquarters, office, inPerson, groupSession, null, null);
+    }
+    
     public Schedule(Long employeeId, Long userId, LocalDateTime startAt, LocalDateTime endAt, String details, String headquarters, String office) {
-        this(employeeId, userId, startAt, endAt, details, headquarters, office, false, false);
+        this(employeeId, userId, startAt, endAt, details, headquarters, office, false, false, null, null);
     }
 
     public Schedule(Long employeeId, Long userId, LocalDateTime startAt, LocalDateTime endAt, String details, Boolean groupSession) {
-        this(employeeId, userId, startAt, endAt, details, null, null, false, groupSession);
+        this(employeeId, userId, startAt, endAt, details, null, null, false, groupSession, null, null);
     }
 }

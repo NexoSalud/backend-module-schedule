@@ -43,8 +43,12 @@ public class ScheduleController {
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) java.time.LocalDateTime startAt,
             @Parameter(description = "Filtra por fecha/hora de fin (ISO)", example = "2025-01-31T23:59:59")
             @RequestParam(required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) java.time.LocalDateTime endAt) {
-        return scheduleService.getAllSchedules(page, size, startAt, endAt)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) java.time.LocalDateTime endAt,
+            @Parameter(description = "Filtra por ID de la oficina", example = "1")
+            @RequestParam(required = false) Long officeId,
+            @Parameter(description = "Filtra por ID de la agenda", example = "1")
+            @RequestParam(required = false) Long agendaId) {
+        return scheduleService.getAllSchedules(page, size, startAt, endAt, officeId, agendaId)
             .map(ResponseEntity::ok);
         }
     
