@@ -7,7 +7,7 @@ spring:
     name: schedule-service
   sql:
     init:
-      mode: always
+      mode: never
       schema-locations: classpath:db/migration/schema.sql
 logging:
   level:

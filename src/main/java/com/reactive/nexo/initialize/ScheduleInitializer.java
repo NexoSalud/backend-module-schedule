@@ -26,14 +26,14 @@ public class ScheduleInitializer implements CommandLineRunner {
         scheduleRepository.count()
                 .flatMapMany(count -> {
                     if (count == 0) {
-                        log.info("Initializing schedule data...");
-                        return createSampleSchedules();
+                        log.info("Schedule data initialization skipped");
+                        return Flux.empty();
                     } else {
                         log.info("Schedule data already exists, skipping initialization");
                         return Flux.empty();
                     }
                 })
-                .doOnComplete(() -> log.info("Schedule initialization completed"))
+                .doOnComplete(() -> log.info("Schedule initialization check completed"))
                 .subscribe();
     }
     
