@@ -97,3 +97,13 @@ CREATE TABLE IF NOT EXISTS medical_agenda (
 CREATE INDEX IF NOT EXISTS idx_med_agenda_employee ON medical_agenda(employee_id);
 CREATE INDEX IF NOT EXISTS idx_med_agenda_status ON medical_agenda(status);
 CREATE INDEX IF NOT EXISTS idx_med_agenda_active ON medical_agenda(is_active);
+
+-- Ensure all columns exist for existing tables
+ALTER TABLE medical_agenda ADD COLUMN IF NOT EXISTS enabled BOOLEAN DEFAULT TRUE;
+ALTER TABLE medical_agenda ADD COLUMN IF NOT EXISTS convenios TEXT;
+ALTER TABLE medical_agenda ADD COLUMN IF NOT EXISTS can_create_medical_history BOOLEAN DEFAULT FALSE;
+ALTER TABLE medical_agenda ADD COLUMN IF NOT EXISTS double_shift BOOLEAN DEFAULT FALSE;
+ALTER TABLE medical_agenda ADD COLUMN IF NOT EXISTS enabled_slots INT;
+ALTER TABLE medical_agenda ADD COLUMN IF NOT EXISTS agenda_state VARCHAR(20) DEFAULT 'ABIERTA';
+ALTER TABLE medical_agenda ADD COLUMN IF NOT EXISTS frequency VARCHAR(50);
+ALTER TABLE medical_agenda ADD COLUMN IF NOT EXISTS created_by VARCHAR(100);
