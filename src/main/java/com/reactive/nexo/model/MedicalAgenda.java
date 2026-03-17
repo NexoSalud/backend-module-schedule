@@ -25,10 +25,10 @@ public class MedicalAgenda {
     private Long officeId;
 
     private LocalDate startDate; // DATE
-    private LocalDate endDate;   // DATE
-    private String workDays;  // CSV: L,M,X,J,V
+    private LocalDate endDate; // DATE
+    private String workDays; // CSV: L,M,X,J,V
     private String startTime; // HH:mm
-    private String endTime;   // HH:mm
+    private String endTime; // HH:mm
     private Integer appointmentDuration;
 
     private String serviceTypes; // JSON/CSV
@@ -36,9 +36,25 @@ public class MedicalAgenda {
     private Boolean requiresReferral;
     private String notes;
 
-    private String status;    // VIGENTE | CON_CONFLICTOS | PROXIMA_A_VENCER | VENCIDA | INACTIVA
+    private String status; // VIGENTE | CON_CONFLICTOS | PROXIMA_A_VENCER | VENCIDA | INACTIVA
     private Boolean isActive;
     private Boolean enabled;
-    private LocalDateTime createdAt; // TIMESTAMP
+
+    // Novedades Phase 1
+    private String convenios; // JSON/CSV de convenios
+    private Boolean canCreateMedicalHistory;
+    private Boolean doubleShift;
+
+    // Novedades Phase 2
+    private Integer enabledSlots;
+
+    // Novedades // Phase 3
+    private String agendaState; // ABIERTA, CERRADA
+    private String createdBy; // Identifier del creador
+
+    // Phase 5
+    private String frequency;
+
+    private LocalDateTime createdAt;
     private LocalDateTime updatedAt; // TIMESTAMP
 }

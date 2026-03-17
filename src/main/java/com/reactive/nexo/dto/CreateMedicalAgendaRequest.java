@@ -28,7 +28,7 @@ public class CreateMedicalAgendaRequest {
     private String startDate; // YYYY-MM-DD
 
     @Schema(description = "Fecha fin vigencia", example = "2026-12-31")
-    private String endDate;   // YYYY-MM-DD
+    private String endDate; // YYYY-MM-DD
 
     @Schema(description = "Días laborales", example = "[\"L\",\"M\",\"X\",\"J\",\"V\"]")
     private List<String> workDays; // L,M,X,J,V
@@ -37,7 +37,7 @@ public class CreateMedicalAgendaRequest {
     private String startTime; // HH:mm
 
     @Schema(description = "Hora fin", example = "17:00")
-    private String endTime;   // HH:mm
+    private String endTime; // HH:mm
 
     @Schema(description = "Duración de la cita en minutos", example = "20")
     private Integer appointmentDuration;
@@ -53,4 +53,26 @@ public class CreateMedicalAgendaRequest {
 
     @Schema(description = "Notas u observaciones")
     private String notes;
+
+    @Schema(description = "IDs de convenios asignados", example = "[1,2]")
+    private List<Integer> convenioIds;
+
+    @Schema(description = "Autorizado para crear historia clínica", example = "true")
+    private Boolean canCreateMedicalHistory;
+
+    @Schema(description = "Turno doble duración", example = "false")
+    private Boolean doubleShift;
+
+    @Schema(description = "Número de turnos habilitados por orden", example = "3")
+    private Integer enabledSlots;
+
+    // Phase 3
+    @Schema(description = "Estado administrativo de la agenda (ABIERTA o CERRADA)", example = "ABIERTA")
+    private String agendaState;
+
+    @Schema(description = "Frecuencia de repetición (NONE, WEEKLY, BIWEEKLY, MONTHLY)", example = "NONE")
+    private String frequency;
+
+    @Schema(description = "Usuario que crea la agenda", example = "admin")
+    private String createdBy;
 }

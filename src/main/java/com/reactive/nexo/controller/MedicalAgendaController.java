@@ -32,10 +32,22 @@ public class MedicalAgendaController {
             @RequestParam(name = "page", defaultValue = "0") Integer page,
             @RequestParam(name = "size", defaultValue = "10") Integer size,
             @RequestParam(name = "employeeId", required = false) Long employeeId,
-            @RequestHeader HttpHeaders headers
-    ) {
+            @RequestHeader HttpHeaders headers) {
         return service.listAgendas(page, size, employeeId, headers)
                 .map(ResponseEntity::ok);
+    }
+
+    @Operation(summary = "Exportar agendas médicas", description = "Devuelve un archivo CSV con las agendas médicas")
+    @ApiResponse(responseCode = "200", description = "Archivo CSV generado")
+    @GetMapping(value = "/export", produces = "text/csv")
+    public Mono<ResponseEntity<byte[]>> exportCsv(
+            @RequestParam(name = "employeeId", required = false) Long employeeId,
+            @RequestHeader HttpHeaders headers) {
+        return service.exportAgendasCsv(employeeId, headers)
+                .map(bytes -> ResponseEntity.ok()
+                        .header(org.springframework.http.HttpHeaders.CONTENT_DISPOSITION,
+                                "attachment; filename=\"agendas.csv\"")
+                        .body(bytes));
     }
 
     @Operation(summary = "Obtener agenda médica por ID")
@@ -81,14 +93,23 @@ public class MedicalAgendaController {
         return service.delete(id).then(Mono.just(ResponseEntity.noContent().build()));
     }
 
+    @Operation(summary = "Clonar/Duplicar agenda médica")
+    @ApiResponse(responseCode = "201", description = "Agendas clonadas")
+    @PostMapping("/{id}/clone")
+    public Mono<ResponseEntity<java.util.List<MedicalAgenda>>> cloneAgenda(
+            @PathVariable Long id,
+            @RequestParam(required = false, defaultValue = "1") String frequency) {
+        return service.cloneAgenda(id, frequency)
+                .map(clones -> ResponseEntity.status(201).body(clones));
+    }
+
     @Operation(summary = "Eventos de calendario por empleado")
     @ApiResponse(responseCode = "200", description = "Eventos obtenidos")
     @GetMapping("/calendar-events")
     public Mono<ResponseEntity<java.util.List<CalendarEventDto>>> calendarEvents(
             @RequestParam Long employeeId,
             @RequestParam String startDate,
-            @RequestParam String endDate
-    ) {
+            @RequestParam String endDate) {
         return service.getCalendarEvents(employeeId, startDate, endDate)
                 .map(ResponseEntity::ok);
     }
@@ -96,7 +117,24 @@ public class MedicalAgendaController {
     @Operation(summary = "Verificar conflictos de agenda")
     @ApiResponse(responseCode = "200", description = "Conflictos devueltos")
     @PostMapping("/check-conflicts")
-    public Mono<ResponseEntity<java.util.List<ScheduleConflictDto>>> checkConflicts(@RequestBody MedicalAgenda payload) {
+    public Mono<ResponseEntity<java.util.List<ScheduleConflictDto>>> checkConflicts(
+            @RequestBody MedicalAgenda payload) {
         return service.checkConflicts(payload).map(ResponseEntity::ok);
+    }
+
+    // Novedad Phase 2: Validación de consultorios
+    @Operation(summary = "Verificar conflictos de consultorio")
+    @ApiResponse(responseCode = "200", description = "Devuelve true si hay conflicto")
+    @GetMapping("/check-office-conflict")
+    public Mono<ResponseEntity<Boolean>> checkOfficeConflict(
+            @RequestParam Long officeId,
+            @RequestParam String startDate,
+            @RequestParam String endDate,
+            @RequestParam String startTime,
+            @RequestParam String endTime,
+            @RequestParam String workDays,
+            @RequestParam(required = false) Long excludeAgendaId) {
+        return service.checkOfficeConflict(officeId, startDate, endDate, startTime, endTime, workDays, excludeAgendaId)
+                .map(ResponseEntity::ok);
     }
 }

@@ -26,6 +26,14 @@ public class MedicalAgendaView {
     public String status;
     public Boolean isActive;
     public Boolean enabled;
+    public String convenios;
+    public Boolean canCreateMedicalHistory;
+    public Boolean doubleShift;
+    public Integer enabledSlots;
+    public String agendaState;
+    public String frequency;
+    public String createdBy;
     public String createdAt;
     public String updatedAt;
+    public java.util.List<ScheduleConflictDto> conflicts;
 }
