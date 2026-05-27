@@ -1,8 +1,8 @@
 spring:
   r2dbc:
-    url: r2dbc:postgresql://localhost:5432/nexosalud
-    username: postgres
-    password: postgres
+    url: ${SPRING_R2DBC_URL:r2dbc:postgresql://localhost:5432/nexosalud}
+    username: ${SPRING_R2DBC_USERNAME:postgres}
+    password: ${SPRING_R2DBC_PASSWORD:postgres}
   application:
     name: schedule-service
   sql:
@@ -14,7 +14,7 @@ logging:
     org.springframework.data.r2dbc: Debug
 
 server:
-  port: 8083
+  port: ${SERVER_PORT:8083}
 
 ---
 spring:
@@ -37,9 +37,9 @@ spring:
     activate:
       on-profile: prod
   r2dbc:
-    url: r2dbc:postgresql://localhost:5433/scheduledb
-    username: postgres
-    password: postgres
+    url: ${SPRING_R2DBC_URL:r2dbc:postgresql://localhost:5432/nexosalud}
+    username: ${SPRING_R2DBC_USERNAME:postgres}
+    password: ${SPRING_R2DBC_PASSWORD:postgres}
   application:
     name: schedule-service
   logging:
@@ -47,4 +47,4 @@ spring:
       org.springframework.data.r2dbc: Debug
 
 server:
-  port: 8083
+  port: ${SERVER_PORT:8083}
