@@ -1,23 +1,16 @@
-# Dockerfile for Spring Boot microservices
-FROM eclipse-temurin:17-jre
-
-# Install Maven
-RUN apt-get update && apt-get install -y maven && rm -rf /var/lib/apt/lists/*
-
+FROM maven:3.9.6-eclipse-temurin-17-alpine AS build
 WORKDIR /app
-
-# Copy pom.xml and resolve dependencies (for better layer caching)
 COPY pom.xml .
-RUN mvn dependency:go-offline
-
-# Copy source code
+RUN mvn dependency:go-offline -q
+ARG DEPLOY_VERSION=1
 COPY src ./src
+RUN mvn clean package -DskipTests -q
 
-# Build the application
-RUN mvn clean package -DskipTests
-
-# Expose port (will be overridden by docker-compose)
-EXPOSE 8080
-
-# Run the application (with schedule-specific JAR name)
-ENTRYPOINT ["java", "-jar", "target/reactive-nexo-schedule-0.0.1-SNAPSHOT.jar"]
+FROM eclipse-temurin:17-jre-alpine
+WORKDIR /app
+RUN apk add --no-cache wget
+COPY --from=build /app/target/*.jar app.jar
+EXPOSE 8083
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+  CMD wget -qO- http://localhost:8083/actuator/health || exit 1
+ENTRYPOINT ["java", "-XX:+UseContainerSupport", "-XX:MaxRAMPercentage=75.0", "-jar", "app.jar"]
