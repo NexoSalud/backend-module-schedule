@@ -5,9 +5,37 @@ CREATE TABLE IF NOT EXISTS schedule (
     start_at TIMESTAMP NOT NULL,
     end_at TIMESTAMP NOT NULL,
     details TEXT,
-    group_session BOOLEAN DEFAULT FALSE,
+    status VARCHAR(24) NOT NULL DEFAULT 'VIGENTE',
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    enabled BOOLEAN DEFAULT TRUE,
+    convenios TEXT,
+    can_create_medical_history BOOLEAN DEFAULT FALSE,
+    double_shift BOOLEAN DEFAULT FALSE,
+    enabled_slots INT, -- Phase 2
+    
+    -- Phase 3
+    agenda_state VARCHAR(20) DEFAULT 'ABIERTA',
+    frequency VARCHAR(50),
+    created_by VARCHAR(100),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Phase 4: Calendario y Excepciones
+CREATE TABLE IF NOT EXISTS schedule_config (
+    id BIGSERIAL PRIMARY KEY,
+    config_type VARCHAR(50) NOT NULL,
+    holiday_date DATE,
+    description VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS calendar_exception (
+    id BIGSERIAL PRIMARY KEY,
+    employee_id BIGINT NOT NULL,
+    exception_date DATE NOT NULL,
+    reason TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE INDEX IF NOT EXISTS idx_schedule_employee_id ON schedule(employee_id);
