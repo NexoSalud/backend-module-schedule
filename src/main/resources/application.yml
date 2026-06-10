@@ -1,20 +1,27 @@
 spring:
   r2dbc:
-    url: r2dbc:postgresql://localhost:5432/nexosalud
-    username: postgres
-    password: postgres
+    url: ${SPRING_R2DBC_URL:r2dbc:postgresql://localhost:5432/nexosalud}
+    username: ${SPRING_R2DBC_USERNAME:postgres}
+    password: ${SPRING_R2DBC_PASSWORD:postgres}
   application:
     name: schedule-service
   sql:
     init:
-      mode: always
-      schema-locations: classpath:db/migration/schema.sql
+      mode: never
+      schema-locations: classpath:schema.sql
+  flyway:
+    enabled: true
+    url: ${SPRING_FLYWAY_URL:jdbc:postgresql://localhost:5432/nexosalud}
+    user: ${SPRING_R2DBC_USERNAME:postgres}
+    password: ${SPRING_R2DBC_PASSWORD:postgres}
+    locations: classpath:db/migration
+    baseline-on-migrate: true
 logging:
   level:
     org.springframework.data.r2dbc: Debug
 
 server:
-  port: 8083
+  port: ${SERVER_PORT:8083}
 
 ---
 spring:
@@ -27,6 +34,8 @@ spring:
     password:
   application:
     name: schedule-service
+  flyway:
+    enabled: false
 
 server:
   port: 8083
@@ -37,14 +46,21 @@ spring:
     activate:
       on-profile: prod
   r2dbc:
-    url: r2dbc:postgresql://localhost:5433/scheduledb
-    username: postgres
-    password: postgres
+    url: ${SPRING_R2DBC_URL:r2dbc:postgresql://localhost:5433/scheduledb}
+    username: ${SPRING_R2DBC_USERNAME:postgres}
+    password: ${SPRING_R2DBC_PASSWORD:postgres}
   application:
     name: schedule-service
   logging:
     level:
       org.springframework.data.r2dbc: Debug
+  flyway:
+    enabled: true
+    url: ${SPRING_FLYWAY_URL:jdbc:postgresql://localhost:5433/scheduledb}
+    user: ${SPRING_R2DBC_USERNAME:postgres}
+    password: ${SPRING_R2DBC_PASSWORD:postgres}
+    locations: classpath:db/migration
+    baseline-on-migrate: true
 
 server:
-  port: 8083
+  port: ${SERVER_PORT:8083}
