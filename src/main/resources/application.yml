@@ -46,7 +46,7 @@ spring:
     activate:
       on-profile: prod
   r2dbc:
-    url: ${SPRING_R2DBC_URL:r2dbc:postgresql://localhost:5433/scheduledb}
+    url: ${SPRING_R2DBC_URL:r2dbc:postgresql://localhost:5432/nexosalud}
     username: ${SPRING_R2DBC_USERNAME:postgres}
     password: ${SPRING_R2DBC_PASSWORD:postgres}
   application:
@@ -56,7 +56,7 @@ spring:
       org.springframework.data.r2dbc: Debug
   flyway:
     enabled: true
-    url: ${SPRING_FLYWAY_URL:jdbc:postgresql://localhost:5433/scheduledb}
+    url: ${SPRING_FLYWAY_URL:jdbc:postgresql://localhost:5432/nexosalud}
     user: ${SPRING_R2DBC_USERNAME:postgres}
     password: ${SPRING_R2DBC_PASSWORD:postgres}
     locations: classpath:db/migration
